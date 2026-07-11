@@ -1,7 +1,10 @@
-import { HABIT_KEYS, calculateTotalPoints, getStage } from "./scoring.js";
-import { getToken, saveToken, fetchEntries, saveEntries } from "./github.js";
+import { calculateTotalPoints, getStage } from "./scoring.js";
+import { getToken, saveToken, clearToken, fetchEntries, saveEntries } from "./github.js";
 
-const todayKey = new Date().toISOString().slice(0, 10);
+const now = new Date();
+const todayKey = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+  .toISOString()
+  .slice(0, 10);
 let entries = {};
 let currentSha = null;
 let saving = false;
@@ -26,15 +29,25 @@ function setStatus(text) {
 
 async function loadEntries() {
   setStatus("読み込み中...");
-  const result = await fetchEntries();
-  entries = result.entries;
-  currentSha = result.sha;
-  if (!entries[todayKey]) entries[todayKey] = {};
-  render();
-  setStatus("");
+  try {
+    const result = await fetchEntries();
+    entries = result.entries;
+    currentSha = result.sha;
+    if (!entries[todayKey]) entries[todayKey] = {};
+    render();
+    setStatus("");
+  } catch (e) {
+    clearToken();
+    const section = document.getElementById("token-setup");
+    const app = document.getElementById("app");
+    section.classList.remove("hidden");
+    app.classList.add("hidden");
+    document.getElementById("token-status").textContent =
+      "読み込みに失敗しました。トークンを確認してください";
+  }
 }
 
-async function toggleHabit(key, btn) {
+async function toggleHabit(key) {
   if (saving) return;
   const previous = entries[todayKey][key] === true;
   entries[todayKey][key] = !previous;
@@ -56,21 +69,14 @@ async function toggleHabit(key, btn) {
 
 function setupToggles() {
   document.querySelectorAll(".habit-toggle").forEach((btn) => {
-    btn.addEventListener("click", () => toggleHabit(btn.dataset.key, btn));
+    btn.addEventListener("click", () => toggleHabit(btn.dataset.key));
   });
 }
 
 function setupTokenForm() {
   const section = document.getElementById("token-setup");
   const app = document.getElementById("app");
-  if (getToken()) {
-    section.classList.add("hidden");
-    app.classList.remove("hidden");
-    loadEntries();
-    return;
-  }
-  section.classList.remove("hidden");
-  app.classList.add("hidden");
+
   document.getElementById("token-save").addEventListener("click", () => {
     const value = document.getElementById("token-input").value.trim();
     if (!value) return;
@@ -79,6 +85,15 @@ function setupTokenForm() {
     app.classList.remove("hidden");
     loadEntries();
   });
+
+  if (getToken()) {
+    section.classList.add("hidden");
+    app.classList.remove("hidden");
+    loadEntries();
+    return;
+  }
+  section.classList.remove("hidden");
+  app.classList.add("hidden");
 }
 
 setupToggles();

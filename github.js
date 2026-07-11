@@ -11,6 +11,10 @@ export function saveToken(token) {
   localStorage.setItem(TOKEN_KEY, token);
 }
 
+export function clearToken() {
+  localStorage.removeItem(TOKEN_KEY);
+}
+
 async function apiRequest(options = {}) {
   const token = getToken();
   const res = await fetch(
