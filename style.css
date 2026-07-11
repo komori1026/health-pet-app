@@ -1,0 +1,48 @@
+* { box-sizing: border-box; }
+
+body {
+  font-family: system-ui, sans-serif;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+  background: #f7f5f0;
+}
+
+.hidden { display: none; }
+
+#pet-display {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+#pet-image {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+}
+
+#today-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.habit-toggle {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 16px;
+}
+
+.habit-toggle.active {
+  background: #ffd76a;
+  border-color: #c99a1f;
+}
+
+#save-status {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+}

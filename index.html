@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>体質改善ペット</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <section id="token-setup" class="hidden">
+    <p>初回のみ、health-pet-data用のGitHubアクセストークンを入力してください。</p>
+    <input type="password" id="token-input" placeholder="github_pat_...">
+    <button id="token-save">保存</button>
+  </section>
+
+  <main id="app">
+    <section id="pet-display">
+      <img id="pet-image" src="characters/current.png" alt="育成中のペット">
+      <p id="pet-stage-name"></p>
+      <p id="pet-points"></p>
+    </section>
+
+    <section id="today-checks">
+      <h2 id="today-date"></h2>
+      <button class="habit-toggle" data-key="kyukanbi">休肝日</button>
+      <button class="habit-toggle" data-key="aerobic">有酸素運動</button>
+      <button class="habit-toggle" data-key="tofu_first">食べる順番</button>
+      <button class="habit-toggle" data-key="stretch">ストレッチ</button>
+      <button class="habit-toggle" data-key="posture">姿勢</button>
+      <button class="habit-toggle" data-key="omega3">オメガ3</button>
+    </section>
+
+    <p id="save-status"></p>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
