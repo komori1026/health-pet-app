@@ -1,4 +1,15 @@
-export const HABIT_KEYS = ["kyukanbi", "aerobic", "tofu_first", "stretch", "posture", "omega3"];
+import { getWeekStart, addDays } from "./calendar.js";
+
+export const HABITS = [
+  { key: "kyukanbi", label: "休肝日", period: "weekly", target: 3, unit: "日/週" },
+  { key: "aerobic", label: "有酸素運動", period: "daily", target: 20, unit: "分" },
+  { key: "tofu_first", label: "食べる順番", period: "daily", target: 1, unit: "" },
+  { key: "stretch", label: "ストレッチ", period: "daily", target: 5, unit: "分" },
+  { key: "posture", label: "姿勢", period: "daily", target: 1, unit: "" },
+  { key: "omega3", label: "オメガ3", period: "daily", target: 1, unit: "" },
+];
+
+export const HABIT_KEYS = HABITS.map((h) => h.key);
 
 export const STAGES = [
   { name: "たまご", min: 0 },
@@ -9,12 +20,21 @@ export const STAGES = [
   { name: "完全体", min: 300 },
 ];
 
+function valueOf(day, key) {
+  if (!day) return 0;
+  return Number(day[key]) || 0;
+}
+
+function pointThreshold(habit) {
+  return habit.period === "weekly" ? 1 : habit.target;
+}
+
 export function calculateTotalPoints(entries) {
   let total = 0;
   for (const date in entries) {
     const day = entries[date];
-    for (const key of HABIT_KEYS) {
-      if (day[key] === true) total += 1;
+    for (const habit of HABITS) {
+      if (valueOf(day, habit.key) >= pointThreshold(habit)) total += 1;
     }
   }
   return total;
@@ -26,4 +46,19 @@ export function getStage(totalPoints) {
     if (totalPoints >= stage.min) current = stage;
   }
   return current;
+}
+
+export function getDailyAchievement(entries, dateKey, habit) {
+  const actual = valueOf(entries[dateKey], habit.key);
+  return { actual, target: habit.target, achieved: actual >= habit.target };
+}
+
+export function getWeeklyAchievement(entries, dateKey, habit) {
+  const weekStart = getWeekStart(dateKey);
+  let actual = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(weekStart, i);
+    actual += valueOf(entries[d], habit.key);
+  }
+  return { actual, target: habit.target, achieved: actual >= habit.target };
 }

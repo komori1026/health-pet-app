@@ -1,26 +1,62 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { calculateTotalPoints, getStage, STAGES, HABIT_KEYS } from "./scoring.js";
+import {
+  HABITS,
+  HABIT_KEYS,
+  STAGES,
+  calculateTotalPoints,
+  getStage,
+  getDailyAchievement,
+  getWeeklyAchievement,
+} from "./scoring.js";
 
-test("HABIT_KEYS は6項目を持つ", () => {
-  assert.equal(HABIT_KEYS.length, 6);
+test("HABITS は6項目を持つ", () => {
+  assert.equal(HABITS.length, 6);
+});
+
+test("HABIT_KEYS はHABITSのkeyから導出される", () => {
+  assert.deepEqual(HABIT_KEYS, [
+    "kyukanbi",
+    "aerobic",
+    "tofu_first",
+    "stretch",
+    "posture",
+    "omega3",
+  ]);
 });
 
 test("calculateTotalPoints は空のentriesで0を返す", () => {
   assert.equal(calculateTotalPoints({}), 0);
 });
 
-test("calculateTotalPoints は複数日のtrue値を合算する", () => {
+test("calculateTotalPoints は1日単位項目を目標達成した場合のみ1ptとする", () => {
   const entries = {
-    "2026-07-10": { kyukanbi: true, aerobic: true, tofu_first: false, stretch: true, posture: false, omega3: true },
-    "2026-07-11": { kyukanbi: false, aerobic: true, tofu_first: true, stretch: false, posture: false, omega3: true },
+    "2026-07-11": {
+      kyukanbi: 1, // 週単位項目なので目標(3)ではなく1以上で1pt
+      aerobic: 10, // 1日単位項目、目標20に届かないので0pt
+      tofu_first: 1, // 1日単位項目、目標1を達成、1pt
+      stretch: 5, // 1日単位項目、目標5ちょうど達成、1pt
+      posture: 0, // 1日単位項目、目標1未達、0pt
+      omega3: 1, // 1日単位項目、目標1を達成、1pt
+    },
   };
-  assert.equal(calculateTotalPoints(entries), 7);
+  // kyukanbi(1) + tofu_first(1) + stretch(1) + omega3(1) = 4pt
+  assert.equal(calculateTotalPoints(entries), 4);
 });
 
-test("calculateTotalPoints は未知のキーを無視する", () => {
-  const entries = { "2026-07-10": { kyukanbi: true, unknown_key: true } };
+test("calculateTotalPoints は真偽値の既存データ(true/false)も後方互換で扱う", () => {
+  const entries = {
+    "2026-07-05": { tofu_first: true, posture: false },
+  };
   assert.equal(calculateTotalPoints(entries), 1);
+});
+
+test("calculateTotalPoints は複数日を合算する", () => {
+  const entries = {
+    "2026-07-10": { tofu_first: 1, omega3: 1 },
+    "2026-07-11": { tofu_first: 1 },
+  };
+  assert.equal(calculateTotalPoints(entries), 3);
 });
 
 test("getStage は0ptで最初のステージを返す", () => {
@@ -32,4 +68,39 @@ test("getStage は境界値で正しいステージを返す", () => {
   assert.equal(getStage(10).name, "幼体");
   assert.equal(getStage(299).name, "成熟期");
   assert.equal(getStage(300).name, "完全体");
+});
+
+test("getDailyAchievement は1日単位項目の実績と目標達成可否を返す", () => {
+  const aerobic = HABITS.find((h) => h.key === "aerobic");
+  const entries = { "2026-07-11": { aerobic: 15 } };
+  const result = getDailyAchievement(entries, "2026-07-11", aerobic);
+  assert.deepEqual(result, { actual: 15, target: 20, achieved: false });
+});
+
+test("getDailyAchievement は記録が無い日は実績0として扱う", () => {
+  const aerobic = HABITS.find((h) => h.key === "aerobic");
+  const result = getDailyAchievement({}, "2026-07-11", aerobic);
+  assert.deepEqual(result, { actual: 0, target: 20, achieved: false });
+});
+
+test("getWeeklyAchievement は指定日を含む週(月-日)の実績を合算する", () => {
+  const kyukanbi = HABITS.find((h) => h.key === "kyukanbi");
+  const entries = {
+    "2026-07-06": { kyukanbi: 1 }, // 月
+    "2026-07-08": { kyukanbi: 1 }, // 水
+    "2026-07-11": { kyukanbi: 0 }, // 土
+  };
+  const result = getWeeklyAchievement(entries, "2026-07-09", kyukanbi);
+  assert.deepEqual(result, { actual: 2, target: 3, achieved: false });
+});
+
+test("getWeeklyAchievement は週の実績が目標に達すればachieved:trueになる", () => {
+  const kyukanbi = HABITS.find((h) => h.key === "kyukanbi");
+  const entries = {
+    "2026-07-06": { kyukanbi: 1 },
+    "2026-07-07": { kyukanbi: 1 },
+    "2026-07-08": { kyukanbi: 1 },
+  };
+  const result = getWeeklyAchievement(entries, "2026-07-12", kyukanbi);
+  assert.deepEqual(result, { actual: 3, target: 3, achieved: true });
 });
