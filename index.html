@@ -21,16 +21,21 @@
       <p id="pet-points"></p>
     </section>
 
-    <section id="today-checks">
-      <h2 id="today-date"></h2>
-      <button class="habit-toggle" data-key="kyukanbi">休肝日</button>
-      <button class="habit-toggle" data-key="aerobic">有酸素運動</button>
-      <button class="habit-toggle" data-key="tofu_first">食べる順番</button>
-      <button class="habit-toggle" data-key="stretch">ストレッチ</button>
-      <button class="habit-toggle" data-key="posture">姿勢</button>
-      <button class="habit-toggle" data-key="omega3">オメガ3</button>
+    <section id="calendar">
+      <div id="calendar-header">
+        <button id="prev-month" type="button">&lt;</button>
+        <span id="calendar-month-label"></span>
+        <button id="next-month" type="button">&gt;</button>
+      </div>
+      <div id="calendar-grid"></div>
     </section>
 
+    <section id="day-detail">
+      <h2 id="selected-date"></h2>
+      <div id="habit-inputs"></div>
+    </section>
+
+    <button id="send-btn" type="button" disabled>送信</button>
     <p id="save-status"></p>
   </main>
 

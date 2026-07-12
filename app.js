@@ -1,30 +1,172 @@
-import { calculateTotalPoints, getStage } from "./scoring.js";
+import {
+  HABITS,
+  calculateTotalPoints,
+  getStage,
+  getDailyAchievement,
+  getWeeklyAchievement,
+} from "./scoring.js";
+import { getMonthGrid } from "./calendar.js";
 import { getToken, saveToken, clearToken, fetchEntries, saveEntries } from "./github.js";
 
-const now = new Date();
-const todayKey = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-  .toISOString()
-  .slice(0, 10);
+function formatDateKey(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+const todayKey = formatDateKey(new Date());
+
 let entries = {};
 let currentSha = null;
-let saving = false;
+let selectedDate = todayKey;
+let viewYear = Number(todayKey.slice(0, 4));
+let viewMonth = Number(todayKey.slice(5, 7));
+let dirty = false;
+let sending = false;
 
-function render() {
-  document.getElementById("today-date").textContent = todayKey;
+function setStatus(text) {
+  document.getElementById("save-status").textContent = text;
+}
+
+function markDirty() {
+  dirty = true;
+  const btn = document.getElementById("send-btn");
+  btn.disabled = false;
+  btn.classList.add("dirty");
+  setStatus("未送信の変更があります");
+}
+
+function clearDirty() {
+  dirty = false;
+  const btn = document.getElementById("send-btn");
+  btn.disabled = true;
+  btn.classList.remove("dirty");
+}
+
+function hasEntry(dateKey) {
+  const day = entries[dateKey];
+  if (!day) return false;
+  return HABITS.some((h) => Number(day[h.key]) > 0);
+}
+
+function renderPet() {
   const total = calculateTotalPoints(entries);
   const stage = getStage(total);
   document.getElementById("pet-stage-name").textContent = stage.name;
   document.getElementById("pet-points").textContent = `累計 ${total}pt`;
-
-  const todayEntry = entries[todayKey] || {};
-  document.querySelectorAll(".habit-toggle").forEach((btn) => {
-    const key = btn.dataset.key;
-    btn.classList.toggle("active", todayEntry[key] === true);
-  });
 }
 
-function setStatus(text) {
-  document.getElementById("save-status").textContent = text;
+function renderCalendar() {
+  document.getElementById("calendar-month-label").textContent = `${viewYear}年${viewMonth}月`;
+  const grid = document.getElementById("calendar-grid");
+  grid.innerHTML = "";
+  const weeks = getMonthGrid(viewYear, viewMonth);
+  for (const week of weeks) {
+    for (const day of week) {
+      const cell = document.createElement("button");
+      cell.type = "button";
+      cell.className = "calendar-day";
+      cell.textContent = String(Number(day.dateKey.slice(8, 10)));
+      if (!day.inMonth) cell.classList.add("outside");
+      if (day.dateKey === todayKey) cell.classList.add("today");
+      if (day.dateKey === selectedDate) cell.classList.add("selected");
+      if (hasEntry(day.dateKey)) cell.classList.add("has-entry");
+      cell.addEventListener("click", () => selectDate(day.dateKey));
+      grid.appendChild(cell);
+    }
+  }
+}
+
+function renderHabitInputs() {
+  document.getElementById("selected-date").textContent = selectedDate;
+  const container = document.getElementById("habit-inputs");
+  container.innerHTML = "";
+  const day = entries[selectedDate] || {};
+
+  for (const habit of HABITS) {
+    const achievement =
+      habit.period === "weekly"
+        ? getWeeklyAchievement(entries, selectedDate, habit)
+        : getDailyAchievement(entries, selectedDate, habit);
+
+    const row = document.createElement("div");
+    row.className = "habit-row";
+    if (achievement.achieved) row.classList.add("achieved");
+
+    const label = document.createElement("span");
+    label.className = "habit-label";
+    label.textContent = habit.label;
+    row.appendChild(label);
+
+    if (habit.target === 1) {
+      const value = Number(day[habit.key]) || 0;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "habit-toggle-btn";
+      btn.textContent = value >= 1 ? "達成" : "未達成";
+      btn.addEventListener("click", () => setValue(habit.key, value >= 1 ? 0 : 1));
+      row.appendChild(btn);
+    } else {
+      const wrap = document.createElement("span");
+      wrap.className = "habit-number";
+      const value = Number(day[habit.key]) || 0;
+
+      const minus = document.createElement("button");
+      minus.type = "button";
+      minus.textContent = "-";
+      minus.addEventListener("click", () => setValue(habit.key, Math.max(0, value - 1)));
+
+      const input = document.createElement("input");
+      input.type = "number";
+      input.min = "0";
+      input.value = String(value);
+      input.addEventListener("change", () => {
+        const next = Math.max(0, Number(input.value) || 0);
+        setValue(habit.key, next);
+      });
+
+      const plus = document.createElement("button");
+      plus.type = "button";
+      plus.textContent = "+";
+      plus.addEventListener("click", () => setValue(habit.key, value + 1));
+
+      wrap.appendChild(minus);
+      wrap.appendChild(input);
+      wrap.appendChild(plus);
+      row.appendChild(wrap);
+    }
+
+    const progress = document.createElement("span");
+    progress.className = "habit-progress";
+    const periodLabel = habit.period === "weekly" ? "今週" : "";
+    progress.textContent = `${periodLabel}${achievement.actual}${habit.unit || ""} / 目標${habit.target}${habit.unit || ""}`;
+    row.appendChild(progress);
+
+    container.appendChild(row);
+  }
+}
+
+function setValue(key, value) {
+  if (!entries[selectedDate]) entries[selectedDate] = {};
+  entries[selectedDate][key] = value;
+  markDirty();
+  renderPet();
+  renderCalendar();
+  renderHabitInputs();
+}
+
+function selectDate(dateKey) {
+  selectedDate = dateKey;
+  renderCalendar();
+  renderHabitInputs();
+}
+
+function changeMonth(delta) {
+  const d = new Date(viewYear, viewMonth - 1 + delta, 1);
+  viewYear = d.getFullYear();
+  viewMonth = d.getMonth() + 1;
+  renderCalendar();
 }
 
 async function loadEntries() {
@@ -33,8 +175,10 @@ async function loadEntries() {
     const result = await fetchEntries();
     entries = result.entries;
     currentSha = result.sha;
-    if (!entries[todayKey]) entries[todayKey] = {};
-    render();
+    renderPet();
+    renderCalendar();
+    renderHabitInputs();
+    clearDirty();
     setStatus("");
   } catch (e) {
     clearToken();
@@ -47,29 +191,37 @@ async function loadEntries() {
   }
 }
 
-async function toggleHabit(key) {
-  if (saving) return;
-  const previous = entries[todayKey][key] === true;
-  entries[todayKey][key] = !previous;
-  render();
-  saving = true;
-  setStatus("保存中...");
+async function sendEntries() {
+  if (!dirty || sending) return;
+  sending = true;
+  setStatus("送信中...");
   try {
     const result = await saveEntries(entries, currentSha);
     currentSha = result.content.sha;
-    setStatus("保存済み");
+    clearDirty();
+    setStatus("送信済み");
   } catch (e) {
-    entries[todayKey][key] = previous;
-    render();
-    setStatus("保存に失敗しました。もう一度タップしてください");
+    setStatus("送信に失敗しました。もう一度お試しください");
   } finally {
-    saving = false;
+    sending = false;
   }
 }
 
-function setupToggles() {
-  document.querySelectorAll(".habit-toggle").forEach((btn) => {
-    btn.addEventListener("click", () => toggleHabit(btn.dataset.key));
+function setupCalendarNav() {
+  document.getElementById("prev-month").addEventListener("click", () => changeMonth(-1));
+  document.getElementById("next-month").addEventListener("click", () => changeMonth(1));
+}
+
+function setupSendButton() {
+  document.getElementById("send-btn").addEventListener("click", sendEntries);
+}
+
+function setupUnloadWarning() {
+  window.addEventListener("beforeunload", (e) => {
+    if (dirty) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
   });
 }
 
@@ -96,5 +248,7 @@ function setupTokenForm() {
   app.classList.add("hidden");
 }
 
-setupToggles();
+setupCalendarNav();
+setupSendButton();
+setupUnloadWarning();
 setupTokenForm();

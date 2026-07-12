@@ -21,23 +21,116 @@ body {
   object-fit: contain;
 }
 
-#today-checks {
+#calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+#calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.calendar-day {
+  padding: 8px 0;
+  text-align: center;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #eee;
+  font-size: 13px;
+}
+
+.calendar-day.outside {
+  color: #bbb;
+}
+
+.calendar-day.has-entry {
+  background: #eef6ea;
+}
+
+.calendar-day.today {
+  border-color: #7cb342;
+}
+
+.calendar-day.selected {
+  background: #ffd76a;
+  border-color: #c99a1f;
+}
+
+#habit-inputs {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-bottom: 16px;
 }
 
-.habit-toggle {
+.habit-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
   background: #fff;
+  gap: 8px;
+}
+
+.habit-row.achieved {
+  background: #ffd76a;
+  border-color: #c99a1f;
+}
+
+.habit-row .habit-label {
+  font-size: 16px;
+  flex: 1;
+}
+
+.habit-row .habit-progress {
+  font-size: 12px;
+  color: #666;
+}
+
+.habit-toggle-btn {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #f0f0f0;
+}
+
+.habit-number {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.habit-number button {
+  width: 28px;
+  height: 28px;
+}
+
+.habit-number input {
+  width: 48px;
+  text-align: center;
   font-size: 16px;
 }
 
-.habit-toggle.active {
-  background: #ffd76a;
-  border-color: #c99a1f;
+#send-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  background: #ccc;
+  color: #666;
+}
+
+#send-btn.dirty {
+  background: #4a90d9;
+  color: #fff;
 }
 
 #save-status {
