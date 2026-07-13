@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>体質改善ペット</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
-  <section id="token-setup" class="hidden">
+  <section id="token-setup" class="card hidden">
     <p>初回のみ、health-pet-data用のGitHubアクセストークンを入力してください。</p>
     <input type="password" id="token-input" placeholder="github_pat_...">
     <button id="token-save">保存</button>
@@ -21,24 +21,29 @@
       <p id="pet-points"></p>
     </section>
 
-    <section id="calendar">
+    <section id="calendar" class="card">
       <div id="calendar-header">
-        <button id="prev-month" type="button">&lt;</button>
+        <button id="prev-month" type="button" class="icon-btn" aria-label="前の月">&lt;</button>
         <span id="calendar-month-label"></span>
-        <button id="next-month" type="button">&gt;</button>
+        <button id="next-month" type="button" class="icon-btn" aria-label="次の月">&gt;</button>
+      </div>
+      <div id="calendar-weekdays">
+        <span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span class="sat">土</span><span class="sun">日</span>
       </div>
       <div id="calendar-grid"></div>
     </section>
 
-    <section id="day-detail">
+    <section id="day-detail" class="card">
       <h2 id="selected-date"></h2>
       <div id="habit-inputs"></div>
     </section>
 
-    <button id="send-btn" type="button" disabled>送信</button>
-    <p id="save-status"></p>
+    <div id="send-bar">
+      <button id="send-btn" type="button" disabled>送信</button>
+      <p id="save-status"></p>
+    </div>
   </main>
 
-  <script type="module" src="app.js"></script>
+  <script type="module" src="app.js?v=3"></script>
 </body>
 </html>

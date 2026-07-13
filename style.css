@@ -4,128 +4,245 @@ body {
   font-family: system-ui, sans-serif;
   max-width: 480px;
   margin: 0 auto;
-  padding: 16px;
-  background: #f7f5f0;
+  padding: 16px 16px 96px;
+  background: #f0f1ea;
+  color: #333;
 }
 
 .hidden { display: none; }
 
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
 #pet-display {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 #pet-image {
-  width: 200px;
-  height: 200px;
+  width: 180px;
+  height: 180px;
   object-fit: contain;
+}
+
+#pet-stage-name {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 4px 0 0;
+}
+
+#pet-points {
+  font-size: 14px;
+  color: #666;
+  margin: 2px 0 0;
 }
 
 #calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
+
+#calendar-month-label {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fafafa;
+  font-size: 16px;
+}
+
+#calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+#calendar-weekdays .sat { color: #4a90d9; }
+#calendar-weekdays .sun { color: #d9534a; }
 
 #calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 4px;
-  margin-bottom: 16px;
 }
 
 .calendar-day {
-  padding: 8px 0;
-  text-align: center;
-  border-radius: 6px;
-  background: #fff;
+  position: relative;
+  height: 44px;
+  border-radius: 8px;
+  background: #fafafa;
   border: 1px solid #eee;
-  font-size: 13px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .calendar-day.outside {
-  color: #bbb;
-}
-
-.calendar-day.has-entry {
-  background: #eef6ea;
+  color: #ccc;
 }
 
 .calendar-day.today {
-  border-color: #7cb342;
+  border: 2px solid #7cb342;
 }
 
 .calendar-day.selected {
   background: #ffd76a;
   border-color: #c99a1f;
+  font-weight: bold;
+}
+
+.entry-dot {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #7cb342;
+}
+
+#day-detail h2 {
+  font-size: 16px;
+  margin: 0 0 12px;
 }
 
 #habit-inputs {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 12px;
 }
 
 .habit-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background: #fff;
-  gap: 8px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  background: #fafafa;
 }
 
 .habit-row.achieved {
-  background: #ffd76a;
+  background: #fff8e6;
   border-color: #c99a1f;
 }
 
-.habit-row .habit-label {
+.habit-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.habit-label {
   font-size: 16px;
-  flex: 1;
 }
 
-.habit-row .habit-progress {
-  font-size: 12px;
-  color: #666;
+.habit-check {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  background: #fff;
+  font-size: 18px;
+  color: #7cb342;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
-.habit-toggle-btn {
-  padding: 8px 16px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: #f0f0f0;
+.habit-row.achieved .habit-check {
+  border-color: #7cb342;
+  background: #eef6ea;
 }
 
 .habit-number {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
-.habit-number button {
-  width: 28px;
-  height: 28px;
+.stepper-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.stepper-btn.quick {
+  width: auto;
+  padding: 0 10px;
+  font-size: 13px;
+  color: #4a90d9;
+  border-color: #4a90d9;
 }
 
 .habit-number input {
-  width: 48px;
+  width: 52px;
+  height: 40px;
   text-align: center;
   font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.habit-progress-text {
+  font-size: 12px;
+  color: #666;
+}
+
+.progress-track {
+  margin-top: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: #e6e6e6;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #4a90d9;
+  border-radius: 3px;
+  transition: width 0.2s ease;
+}
+
+.habit-row.achieved .progress-fill {
+  background: #7cb342;
+}
+
+#send-bar {
+  position: sticky;
+  bottom: 0;
+  background: #f0f1ea;
+  padding: 12px 0 4px;
 }
 
 #send-btn {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   font-size: 16px;
-  border-radius: 8px;
+  font-weight: bold;
+  border-radius: 10px;
   border: none;
   background: #ccc;
-  color: #666;
+  color: #888;
 }
 
 #send-btn.dirty {
@@ -134,7 +251,7 @@ body {
 }
 
 #save-status {
-  margin-top: 12px;
+  margin-top: 6px;
   font-size: 13px;
   color: #666;
   text-align: center;
