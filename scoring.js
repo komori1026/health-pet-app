@@ -62,3 +62,14 @@ export function getWeeklyAchievement(entries, dateKey, habit) {
   }
   return { actual, target: habit.target, achieved: actual >= habit.target };
 }
+
+export function getLatestComment(entries) {
+  let latest = null;
+  for (const dateKey in entries) {
+    const comment = entries[dateKey] && entries[dateKey].ai_comment;
+    if (comment && (!latest || dateKey > latest.dateKey)) {
+      latest = { dateKey, comment };
+    }
+  }
+  return latest;
+}
