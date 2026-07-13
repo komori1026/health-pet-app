@@ -1,13 +1,13 @@
 import {
   HABITS,
   calculateTotalPoints,
-  getStage,
   getDailyAchievement,
   getWeeklyAchievement,
   getLatestComment,
-} from "./scoring.js?v=4";
-import { getMonthGrid } from "./calendar.js?v=4";
-import { getToken, saveToken, clearToken, fetchEntries, saveEntries } from "./github.js?v=4";
+  findCharacterImage,
+} from "./scoring.js?v=5";
+import { getMonthGrid } from "./calendar.js?v=5";
+import { getToken, saveToken, clearToken, fetchEntries, saveEntries } from "./github.js?v=5";
 
 const WEEKDAY_JA = ["日", "月", "火", "水", "木", "金", "土"];
 
@@ -61,10 +61,14 @@ function hasEntry(dateKey) {
 
 function renderPet() {
   const total = calculateTotalPoints(entries);
-  const stage = getStage(total);
-  document.getElementById("pet-stage-name").textContent = stage.name;
   document.getElementById("pet-points").textContent = `累計 ${total}pt`;
   renderComment();
+  renderPetImage();
+}
+
+function renderPetImage() {
+  const path = findCharacterImage(entries, selectedDate);
+  document.getElementById("pet-image").src = path ? `characters/${path}` : "characters/current.png";
 }
 
 function renderComment() {
@@ -217,6 +221,7 @@ function selectDate(dateKey) {
   selectedDate = dateKey;
   renderCalendar();
   renderHabitInputs();
+  renderPetImage();
 }
 
 function changeMonth(delta) {

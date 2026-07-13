@@ -30,12 +30,6 @@ body {
   object-fit: contain;
 }
 
-#pet-stage-name {
-  font-size: 20px;
-  font-weight: bold;
-  margin: 4px 0 0;
-}
-
 #pet-points {
   font-size: 14px;
   color: #666;
