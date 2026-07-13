@@ -42,6 +42,31 @@ body {
   margin: 2px 0 0;
 }
 
+#pet-comment {
+  margin: 10px auto 0;
+  max-width: 320px;
+  padding: 10px 14px;
+  background: #eef6ea;
+  border: 1px solid #7cb342;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #444;
+  text-align: left;
+  position: relative;
+}
+
+#pet-comment::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 8px 8px 8px;
+  border-style: solid;
+  border-color: transparent transparent #7cb342 transparent;
+}
+
 #calendar-header {
   display: flex;
   justify-content: space-between;

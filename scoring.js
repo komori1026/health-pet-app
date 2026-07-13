@@ -1,4 +1,4 @@
-import { getWeekStart, addDays } from "./calendar.js?v=3";
+import { getWeekStart, addDays } from "./calendar.js?v=4";
 
 export const HABITS = [
   { key: "kyukanbi", label: "休肝日", period: "weekly", target: 3, unit: "日/週" },

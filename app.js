@@ -4,9 +4,10 @@ import {
   getStage,
   getDailyAchievement,
   getWeeklyAchievement,
-} from "./scoring.js?v=3";
-import { getMonthGrid } from "./calendar.js?v=3";
-import { getToken, saveToken, clearToken, fetchEntries, saveEntries } from "./github.js?v=3";
+  getLatestComment,
+} from "./scoring.js?v=4";
+import { getMonthGrid } from "./calendar.js?v=4";
+import { getToken, saveToken, clearToken, fetchEntries, saveEntries } from "./github.js?v=4";
 
 const WEEKDAY_JA = ["日", "月", "火", "水", "木", "金", "土"];
 
@@ -63,6 +64,19 @@ function renderPet() {
   const stage = getStage(total);
   document.getElementById("pet-stage-name").textContent = stage.name;
   document.getElementById("pet-points").textContent = `累計 ${total}pt`;
+  renderComment();
+}
+
+function renderComment() {
+  const latest = getLatestComment(entries);
+  const el = document.getElementById("pet-comment");
+  if (latest) {
+    el.textContent = latest.comment;
+    el.classList.remove("hidden");
+  } else {
+    el.textContent = "";
+    el.classList.add("hidden");
+  }
 }
 
 function renderCalendar() {
