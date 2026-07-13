@@ -11,15 +11,6 @@ export const HABITS = [
 
 export const HABIT_KEYS = HABITS.map((h) => h.key);
 
-export const STAGES = [
-  { name: "たまご", min: 0 },
-  { name: "幼体", min: 10 },
-  { name: "少年期", min: 30 },
-  { name: "成長期", min: 70 },
-  { name: "成熟期", min: 150 },
-  { name: "完全体", min: 300 },
-];
-
 function valueOf(day, key) {
   if (!day) return 0;
   return Number(day[key]) || 0;
@@ -38,14 +29,6 @@ export function calculateTotalPoints(entries) {
     }
   }
   return total;
-}
-
-export function getStage(totalPoints) {
-  let current = STAGES[0];
-  for (const stage of STAGES) {
-    if (totalPoints >= stage.min) current = stage;
-  }
-  return current;
 }
 
 export function getDailyAchievement(entries, dateKey, habit) {
@@ -72,4 +55,12 @@ export function getLatestComment(entries) {
     }
   }
   return latest;
+}
+
+export function findCharacterImage(entries, dateKey) {
+  const keys = Object.keys(entries)
+    .filter((k) => k <= dateKey && entries[k] && entries[k].character_image)
+    .sort();
+  if (keys.length === 0) return null;
+  return entries[keys[keys.length - 1]].character_image;
 }

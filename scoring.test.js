@@ -3,12 +3,11 @@ import assert from "node:assert/strict";
 import {
   HABITS,
   HABIT_KEYS,
-  STAGES,
   calculateTotalPoints,
-  getStage,
   getDailyAchievement,
   getWeeklyAchievement,
   getLatestComment,
+  findCharacterImage,
 } from "./scoring.js";
 
 test("HABITS は6項目を持つ", () => {
@@ -58,17 +57,6 @@ test("calculateTotalPoints は複数日を合算する", () => {
     "2026-07-11": { tofu_first: 1 },
   };
   assert.equal(calculateTotalPoints(entries), 3);
-});
-
-test("getStage は0ptで最初のステージを返す", () => {
-  assert.equal(getStage(0).name, STAGES[0].name);
-});
-
-test("getStage は境界値で正しいステージを返す", () => {
-  assert.equal(getStage(9).name, "たまご");
-  assert.equal(getStage(10).name, "幼体");
-  assert.equal(getStage(299).name, "成熟期");
-  assert.equal(getStage(300).name, "完全体");
 });
 
 test("getDailyAchievement は1日単位項目の実績と目標達成可否を返す", () => {
@@ -131,4 +119,38 @@ test("getLatestComment は複数日から最新の日付のコメントを返す
     dateKey: "2026-07-12",
     comment: "新しいコメント",
   });
+});
+
+test("findCharacterImage はentriesが空ならnullを返す", () => {
+  assert.equal(findCharacterImage({}, "2026-07-13"), null);
+});
+
+test("findCharacterImage は指定日にcharacter_imageがあればそれを返す", () => {
+  const entries = {
+    "2026-07-13": { character_image: "history/2026-07-13.png" },
+  };
+  assert.equal(findCharacterImage(entries, "2026-07-13"), "history/2026-07-13.png");
+});
+
+test("findCharacterImage は指定日に無ければ直近の過去日にフォールバックする", () => {
+  const entries = {
+    "2026-07-10": { character_image: "history/2026-07-10.png" },
+    "2026-07-12": { character_image: "history/2026-07-12.png" },
+  };
+  assert.equal(findCharacterImage(entries, "2026-07-13"), "history/2026-07-12.png");
+});
+
+test("findCharacterImage は指定日より後の日付は無視する", () => {
+  const entries = {
+    "2026-07-14": { character_image: "history/2026-07-14.png" },
+  };
+  assert.equal(findCharacterImage(entries, "2026-07-13"), null);
+});
+
+test("findCharacterImage はcharacter_imageを持たない日をスキップする", () => {
+  const entries = {
+    "2026-07-11": { aerobic: 10 },
+    "2026-07-09": { character_image: "history/2026-07-09.png" },
+  };
+  assert.equal(findCharacterImage(entries, "2026-07-11"), "history/2026-07-09.png");
 });
