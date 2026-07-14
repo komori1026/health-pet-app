@@ -246,6 +246,27 @@ body {
   background: #7cb342;
 }
 
+#diary-section {
+  margin-top: 16px;
+}
+
+#diary-section label {
+  display: block;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+#diary-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  resize: vertical;
+}
+
 #send-bar {
   position: sticky;
   bottom: 0;

@@ -1,4 +1,4 @@
-import { getWeekStart, addDays } from "./calendar.js?v=5";
+import { getWeekStart, addDays } from "./calendar.js?v=6";
 
 export const HABITS = [
   { key: "kyukanbi", label: "休肝日", period: "weekly", target: 3, unit: "日/週" },
@@ -7,6 +7,7 @@ export const HABITS = [
   { key: "stretch", label: "ストレッチ", period: "daily", target: 5, unit: "分" },
   { key: "posture", label: "姿勢", period: "daily", target: 1, unit: "" },
   { key: "omega3", label: "オメガ3", period: "daily", target: 1, unit: "" },
+  { key: "kintore", label: "筋トレ", period: "daily", target: 15, unit: "分" },
 ];
 
 export const HABIT_KEYS = HABITS.map((h) => h.key);
@@ -46,15 +47,9 @@ export function getWeeklyAchievement(entries, dateKey, habit) {
   return { actual, target: habit.target, achieved: actual >= habit.target };
 }
 
-export function getLatestComment(entries) {
-  let latest = null;
-  for (const dateKey in entries) {
-    const comment = entries[dateKey] && entries[dateKey].ai_comment;
-    if (comment && (!latest || dateKey > latest.dateKey)) {
-      latest = { dateKey, comment };
-    }
-  }
-  return latest;
+export function getCommentForDate(entries, dateKey) {
+  const comment = entries[dateKey] && entries[dateKey].ai_comment;
+  return comment || null;
 }
 
 export function findCharacterImage(entries, dateKey) {

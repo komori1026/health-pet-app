@@ -3,11 +3,11 @@ import {
   calculateTotalPoints,
   getDailyAchievement,
   getWeeklyAchievement,
-  getLatestComment,
+  getCommentForDate,
   findCharacterImage,
-} from "./scoring.js?v=5";
-import { getMonthGrid } from "./calendar.js?v=5";
-import { getToken, saveToken, clearToken, fetchEntries, saveEntries } from "./github.js?v=5";
+} from "./scoring.js?v=6";
+import { getMonthGrid } from "./calendar.js?v=6";
+import { getToken, saveToken, clearToken, fetchEntries, saveEntries } from "./github.js?v=6";
 
 const WEEKDAY_JA = ["日", "月", "火", "水", "木", "金", "土"];
 
@@ -72,10 +72,10 @@ function renderPetImage() {
 }
 
 function renderComment() {
-  const latest = getLatestComment(entries);
+  const comment = getCommentForDate(entries, selectedDate);
   const el = document.getElementById("pet-comment");
-  if (latest) {
-    el.textContent = latest.comment;
+  if (comment) {
+    el.textContent = comment;
     el.classList.remove("hidden");
   } else {
     el.textContent = "";
@@ -119,6 +119,7 @@ function renderHabitInputs() {
   const container = document.getElementById("habit-inputs");
   container.innerHTML = "";
   const day = entries[selectedDate] || {};
+  document.getElementById("diary-input").value = day.user_comment || "";
 
   for (const habit of HABITS) {
     const achievement =
@@ -153,11 +154,11 @@ function renderHabitInputs() {
       const wrap = document.createElement("span");
       wrap.className = "habit-number";
 
-      const minus = document.createElement("button");
-      minus.type = "button";
-      minus.className = "stepper-btn";
-      minus.textContent = "−";
-      minus.addEventListener("click", () => setValue(habit.key, Math.max(0, value - 1)));
+      const minus5 = document.createElement("button");
+      minus5.type = "button";
+      minus5.className = "stepper-btn";
+      minus5.textContent = "−5";
+      minus5.addEventListener("click", () => setValue(habit.key, Math.max(0, value - 5)));
 
       const input = document.createElement("input");
       input.type = "number";
@@ -168,22 +169,15 @@ function renderHabitInputs() {
         setValue(habit.key, next);
       });
 
-      const plus = document.createElement("button");
-      plus.type = "button";
-      plus.className = "stepper-btn";
-      plus.textContent = "+";
-      plus.addEventListener("click", () => setValue(habit.key, value + 1));
+      const plus5 = document.createElement("button");
+      plus5.type = "button";
+      plus5.className = "stepper-btn";
+      plus5.textContent = "+5";
+      plus5.addEventListener("click", () => setValue(habit.key, value + 5));
 
-      const quick5 = document.createElement("button");
-      quick5.type = "button";
-      quick5.className = "stepper-btn quick";
-      quick5.textContent = "+5";
-      quick5.addEventListener("click", () => setValue(habit.key, value + 5));
-
-      wrap.appendChild(minus);
+      wrap.appendChild(minus5);
       wrap.appendChild(input);
-      wrap.appendChild(plus);
-      wrap.appendChild(quick5);
+      wrap.appendChild(plus5);
       top.appendChild(wrap);
     }
 
@@ -222,6 +216,7 @@ function selectDate(dateKey) {
   renderCalendar();
   renderHabitInputs();
   renderPetImage();
+  renderComment();
 }
 
 function changeMonth(delta) {
@@ -278,6 +273,15 @@ function setupSendButton() {
   document.getElementById("send-btn").addEventListener("click", sendEntries);
 }
 
+function setupDiaryInput() {
+  const el = document.getElementById("diary-input");
+  el.addEventListener("input", () => {
+    if (!entries[selectedDate]) entries[selectedDate] = {};
+    entries[selectedDate].user_comment = el.value;
+    markDirty();
+  });
+}
+
 function setupUnloadWarning() {
   window.addEventListener("beforeunload", (e) => {
     if (dirty) {
@@ -312,5 +316,6 @@ function setupTokenForm() {
 
 setupCalendarNav();
 setupSendButton();
+setupDiaryInput();
 setupUnloadWarning();
 setupTokenForm();
