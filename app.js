@@ -4,9 +4,9 @@ import {
   getDailyAchievement,
   getCommentForDate,
   findCharacterImage,
-} from "./scoring.js?v=6";
-import { getMonthGrid } from "./calendar.js?v=6";
-import { getToken, saveToken, clearToken, fetchEntries, saveEntries } from "./github.js?v=6";
+} from "./scoring.js?v=7";
+import { getMonthGrid } from "./calendar.js?v=7";
+import { getToken, saveToken, clearToken, fetchEntries, saveEntries } from "./github.js?v=7";
 
 const WEEKDAY_JA = ["日", "月", "火", "水", "木", "金", "土"];
 
