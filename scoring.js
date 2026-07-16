@@ -1,7 +1,5 @@
-import { getWeekStart, addDays } from "./calendar.js?v=6";
-
 export const HABITS = [
-  { key: "kyukanbi", label: "休肝日", period: "weekly", target: 3, unit: "日/週" },
+  { key: "kyukanbi", label: "休肝日", period: "daily", target: 1, unit: "" },
   { key: "aerobic", label: "有酸素運動", period: "daily", target: 20, unit: "分" },
   { key: "tofu_first", label: "食べる順番", period: "daily", target: 1, unit: "" },
   { key: "stretch", label: "ストレッチ", period: "daily", target: 5, unit: "分" },
@@ -17,16 +15,17 @@ function valueOf(day, key) {
   return Number(day[key]) || 0;
 }
 
-function pointThreshold(habit) {
-  return habit.period === "weekly" ? 1 : habit.target;
+export function calculateTotalPoints(entries) {
+  return calculateTotalPointsUpTo(entries, null);
 }
 
-export function calculateTotalPoints(entries) {
+export function calculateTotalPointsUpTo(entries, dateKey) {
   let total = 0;
   for (const date in entries) {
+    if (dateKey && date > dateKey) continue;
     const day = entries[date];
     for (const habit of HABITS) {
-      if (valueOf(day, habit.key) >= pointThreshold(habit)) total += 1;
+      if (valueOf(day, habit.key) >= habit.target) total += 1;
     }
   }
   return total;
@@ -34,16 +33,6 @@ export function calculateTotalPoints(entries) {
 
 export function getDailyAchievement(entries, dateKey, habit) {
   const actual = valueOf(entries[dateKey], habit.key);
-  return { actual, target: habit.target, achieved: actual >= habit.target };
-}
-
-export function getWeeklyAchievement(entries, dateKey, habit) {
-  const weekStart = getWeekStart(dateKey);
-  let actual = 0;
-  for (let i = 0; i < 7; i++) {
-    const d = addDays(weekStart, i);
-    actual += valueOf(entries[d], habit.key);
-  }
   return { actual, target: habit.target, achieved: actual >= habit.target };
 }
 

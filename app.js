@@ -1,8 +1,7 @@
 import {
   HABITS,
-  calculateTotalPoints,
+  calculateTotalPointsUpTo,
   getDailyAchievement,
-  getWeeklyAchievement,
   getCommentForDate,
   findCharacterImage,
 } from "./scoring.js?v=6";
@@ -60,7 +59,7 @@ function hasEntry(dateKey) {
 }
 
 function renderPet() {
-  const total = calculateTotalPoints(entries);
+  const total = calculateTotalPointsUpTo(entries, selectedDate);
   document.getElementById("pet-points").textContent = `累計 ${total}pt`;
   renderComment();
   renderPetImage();
@@ -73,13 +72,14 @@ function renderPetImage() {
 
 function renderComment() {
   const comment = getCommentForDate(entries, selectedDate);
+  const section = document.getElementById("trainer-comment-section");
   const el = document.getElementById("pet-comment");
   if (comment) {
     el.textContent = comment;
-    el.classList.remove("hidden");
+    section.classList.remove("hidden");
   } else {
     el.textContent = "";
-    el.classList.add("hidden");
+    section.classList.add("hidden");
   }
 }
 
@@ -122,10 +122,7 @@ function renderHabitInputs() {
   document.getElementById("diary-input").value = day.user_comment || "";
 
   for (const habit of HABITS) {
-    const achievement =
-      habit.period === "weekly"
-        ? getWeeklyAchievement(entries, selectedDate, habit)
-        : getDailyAchievement(entries, selectedDate, habit);
+    const achievement = getDailyAchievement(entries, selectedDate, habit);
 
     const row = document.createElement("div");
     row.className = "habit-row";
@@ -139,7 +136,7 @@ function renderHabitInputs() {
     label.textContent = habit.label;
     top.appendChild(label);
 
-    const isToggle = habit.period === "weekly" || habit.target === 1;
+    const isToggle = habit.target === 1;
     if (isToggle) {
       const value = Number(day[habit.key]) || 0;
       const check = document.createElement("button");
@@ -185,8 +182,7 @@ function renderHabitInputs() {
 
     const progressText = document.createElement("span");
     progressText.className = "habit-progress-text";
-    const periodLabel = habit.period === "weekly" ? "今週" : "";
-    progressText.textContent = `${periodLabel}${achievement.actual}${habit.unit || ""} / 目標${habit.target}${habit.unit || ""}`;
+    progressText.textContent = `${achievement.actual}${habit.unit || ""} / 目標${habit.target}${habit.unit || ""}`;
     row.appendChild(progressText);
 
     const track = document.createElement("div");
@@ -215,8 +211,7 @@ function selectDate(dateKey) {
   selectedDate = dateKey;
   renderCalendar();
   renderHabitInputs();
-  renderPetImage();
-  renderComment();
+  renderPet();
 }
 
 function changeMonth(delta) {

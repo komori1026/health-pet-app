@@ -36,9 +36,12 @@ body {
   margin: 2px 0 0;
 }
 
+#trainer-comment-section {
+  margin-top: 16px;
+}
+
 #pet-comment {
-  margin: 10px auto 0;
-  max-width: 320px;
+  margin: 0;
   padding: 10px 14px;
   background: #eef6ea;
   border: 1px solid #7cb342;
@@ -47,18 +50,6 @@ body {
   line-height: 1.5;
   color: #444;
   text-align: left;
-  position: relative;
-}
-
-#pet-comment::before {
-  content: "";
-  position: absolute;
-  top: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 0 8px 8px 8px;
-  border-style: solid;
-  border-color: transparent transparent #7cb342 transparent;
 }
 
 #calendar-header {
@@ -250,7 +241,8 @@ body {
   margin-top: 16px;
 }
 
-#diary-section label {
+#diary-section label,
+#trainer-comment-section label {
   display: block;
   font-size: 13px;
   color: #666;

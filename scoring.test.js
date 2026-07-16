@@ -4,8 +4,8 @@ import {
   HABITS,
   HABIT_KEYS,
   calculateTotalPoints,
+  calculateTotalPointsUpTo,
   getDailyAchievement,
-  getWeeklyAchievement,
   getCommentForDate,
   findCharacterImage,
 } from "./scoring.js";
@@ -33,7 +33,7 @@ test("calculateTotalPoints は空のentriesで0を返す", () => {
 test("calculateTotalPoints は1日単位項目を目標達成した場合のみ1ptとする", () => {
   const entries = {
     "2026-07-11": {
-      kyukanbi: 1, // 週単位項目なので目標(3)ではなく1以上で1pt
+      kyukanbi: 1, // 1日単位項目、目標1を達成、1pt
       aerobic: 10, // 1日単位項目、目標20に届かないので0pt
       tofu_first: 1, // 1日単位項目、目標1を達成、1pt
       stretch: 5, // 1日単位項目、目標5ちょうど達成、1pt
@@ -81,26 +81,35 @@ test("getDailyAchievement は記録が無い日は実績0として扱う", () =>
   assert.deepEqual(result, { actual: 0, target: 20, achieved: false });
 });
 
-test("getWeeklyAchievement は指定日を含む週(月-日)の実績を合算する", () => {
+test("getDailyAchievement は休肝日を1回達成すればachieved:trueになる", () => {
   const kyukanbi = HABITS.find((h) => h.key === "kyukanbi");
-  const entries = {
-    "2026-07-06": { kyukanbi: 1 }, // 月
-    "2026-07-08": { kyukanbi: 1 }, // 水
-    "2026-07-11": { kyukanbi: 0 }, // 土
-  };
-  const result = getWeeklyAchievement(entries, "2026-07-09", kyukanbi);
-  assert.deepEqual(result, { actual: 2, target: 3, achieved: false });
+  const entries = { "2026-07-11": { kyukanbi: 1 } };
+  const result = getDailyAchievement(entries, "2026-07-11", kyukanbi);
+  assert.deepEqual(result, { actual: 1, target: 1, achieved: true });
 });
 
-test("getWeeklyAchievement は週の実績が目標に達すればachieved:trueになる", () => {
-  const kyukanbi = HABITS.find((h) => h.key === "kyukanbi");
+test("calculateTotalPointsUpTo は指定日以前のエントリのみ合算する", () => {
   const entries = {
-    "2026-07-06": { kyukanbi: 1 },
-    "2026-07-07": { kyukanbi: 1 },
-    "2026-07-08": { kyukanbi: 1 },
+    "2026-07-10": { tofu_first: 1 },
+    "2026-07-11": { tofu_first: 1 },
+    "2026-07-12": { tofu_first: 1 },
   };
-  const result = getWeeklyAchievement(entries, "2026-07-12", kyukanbi);
-  assert.deepEqual(result, { actual: 3, target: 3, achieved: true });
+  assert.equal(calculateTotalPointsUpTo(entries, "2026-07-11"), 2);
+});
+
+test("calculateTotalPointsUpTo は指定日を含める", () => {
+  const entries = {
+    "2026-07-11": { omega3: 1 },
+  };
+  assert.equal(calculateTotalPointsUpTo(entries, "2026-07-11"), 1);
+});
+
+test("calculateTotalPoints はcalculateTotalPointsUpToの日付指定なし版として全期間を合算する", () => {
+  const entries = {
+    "2026-07-10": { tofu_first: 1 },
+    "2026-07-20": { tofu_first: 1 },
+  };
+  assert.equal(calculateTotalPoints(entries), calculateTotalPointsUpTo(entries, "2026-07-20"));
 });
 
 test("getCommentForDate は指定日にai_commentが無ければnullを返す", () => {
