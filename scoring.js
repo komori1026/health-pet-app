@@ -4,7 +4,7 @@ export const HABITS = [
   { key: "tofu_first", label: "食べる順番", period: "daily", target: 1, unit: "" },
   { key: "stretch", label: "ストレッチ", period: "daily", target: 5, unit: "分" },
   { key: "posture", label: "姿勢", period: "daily", target: 1, unit: "" },
-  { key: "omega3", label: "オメガ3", period: "daily", target: 1, unit: "" },
+  { key: "omega3", label: "オメガ3", period: "daily", target: 6, unit: "錠", step: 1, max: 6 },
   { key: "kintore", label: "筋トレ", period: "daily", target: 15, unit: "分" },
 ];
 

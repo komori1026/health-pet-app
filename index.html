@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>体質改善ペット</title>
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
   <section id="token-setup" class="card hidden">
@@ -15,6 +15,10 @@
   </section>
 
   <main id="app" class="hidden">
+    <div id="profile-open-bar">
+      <button id="profile-open-btn" type="button">📋 わたしの目標</button>
+    </div>
+
     <section id="calendar" class="card">
       <div id="calendar-header">
         <button id="prev-month" type="button" class="icon-btn" aria-label="前の月">&lt;</button>
@@ -51,6 +55,24 @@
     </div>
   </main>
 
-  <script type="module" src="app.js?v=7"></script>
+  <!-- 次回採血(健診)の結果が出たら、このセクションの内容を最新の数値・目標に書き換えること -->
+  <div id="profile-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <button id="profile-close-btn" type="button" class="icon-btn" aria-label="閉じる">×</button>
+      <h2>わたしの体質改善ゴール</h2>
+
+      <section class="profile-block">
+        <h3>今の課題(2026年6月26日の健診より)</h3>
+        <p>中性脂肪268(基準149以下)・尿酸7.7(基準7.0以下)・総コレステロール230(基準219以下)が基準を超過。腹囲は増えているのにBMIは正常範囲なので、内臓脂肪型の疑いあり。</p>
+      </section>
+
+      <section class="profile-block">
+        <h3>目指しているところ</h3>
+        <p>次回採血(2026年9月頃予定)までに、中性脂肪・尿酸・総コレステロールを基準値内に戻すのが目標。内臓脂肪は有酸素運動への反応が特に早いので最優先。食事は蛋白質→野菜→炭水化物の順番、魚や大豆を優先。休肝日を増やし、オメガ3を毎日欠かさず続けることも並行して取り組む。</p>
+      </section>
+    </div>
+  </div>
+
+  <script type="module" src="app.js?v=8"></script>
 </body>
 </html>

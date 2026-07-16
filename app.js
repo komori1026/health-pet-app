@@ -4,9 +4,9 @@ import {
   getDailyAchievement,
   getCommentForDate,
   findCharacterImage,
-} from "./scoring.js?v=7";
-import { getMonthGrid } from "./calendar.js?v=7";
-import { getToken, saveToken, clearToken, fetchEntries, saveEntries } from "./github.js?v=7";
+} from "./scoring.js?v=8";
+import { getMonthGrid } from "./calendar.js?v=8";
+import { getToken, saveToken, clearToken, fetchEntries, saveEntries } from "./github.js?v=8";
 
 const WEEKDAY_JA = ["日", "月", "火", "水", "木", "金", "土"];
 
@@ -148,33 +148,37 @@ function renderHabitInputs() {
       top.appendChild(check);
     } else {
       const value = Number(day[habit.key]) || 0;
+      const step = habit.step || 5;
+      const max = habit.max;
+      const clamp = (n) => (max != null ? Math.min(max, n) : n);
       const wrap = document.createElement("span");
       wrap.className = "habit-number";
 
-      const minus5 = document.createElement("button");
-      minus5.type = "button";
-      minus5.className = "stepper-btn";
-      minus5.textContent = "−5";
-      minus5.addEventListener("click", () => setValue(habit.key, Math.max(0, value - 5)));
+      const minusBtn = document.createElement("button");
+      minusBtn.type = "button";
+      minusBtn.className = "stepper-btn";
+      minusBtn.textContent = `−${step}`;
+      minusBtn.addEventListener("click", () => setValue(habit.key, Math.max(0, value - step)));
 
       const input = document.createElement("input");
       input.type = "number";
       input.min = "0";
+      if (max != null) input.max = String(max);
       input.value = String(value);
       input.addEventListener("change", () => {
-        const next = Math.max(0, Number(input.value) || 0);
+        const next = clamp(Math.max(0, Number(input.value) || 0));
         setValue(habit.key, next);
       });
 
-      const plus5 = document.createElement("button");
-      plus5.type = "button";
-      plus5.className = "stepper-btn";
-      plus5.textContent = "+5";
-      plus5.addEventListener("click", () => setValue(habit.key, value + 5));
+      const plusBtn = document.createElement("button");
+      plusBtn.type = "button";
+      plusBtn.className = "stepper-btn";
+      plusBtn.textContent = `+${step}`;
+      plusBtn.addEventListener("click", () => setValue(habit.key, clamp(value + step)));
 
-      wrap.appendChild(minus5);
+      wrap.appendChild(minusBtn);
       wrap.appendChild(input);
-      wrap.appendChild(plus5);
+      wrap.appendChild(plusBtn);
       top.appendChild(wrap);
     }
 
@@ -277,6 +281,18 @@ function setupDiaryInput() {
   });
 }
 
+function setupProfileModal() {
+  const modal = document.getElementById("profile-modal");
+  const openBtn = document.getElementById("profile-open-btn");
+  const closeBtn = document.getElementById("profile-close-btn");
+
+  openBtn.addEventListener("click", () => modal.classList.remove("hidden"));
+  closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.classList.add("hidden");
+  });
+}
+
 function setupUnloadWarning() {
   window.addEventListener("beforeunload", (e) => {
     if (dirty) {
@@ -312,5 +328,6 @@ function setupTokenForm() {
 setupCalendarNav();
 setupSendButton();
 setupDiaryInput();
+setupProfileModal();
 setupUnloadWarning();
 setupTokenForm();
