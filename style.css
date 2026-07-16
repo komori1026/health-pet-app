@@ -77,6 +77,10 @@ body {
   z-index: 100;
 }
 
+.modal-overlay.hidden {
+  display: none;
+}
+
 .modal-card {
   position: relative;
   background: #fff;
