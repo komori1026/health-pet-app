@@ -175,6 +175,12 @@ body {
   color: #ccc;
 }
 
+.calendar-day.disabled {
+  color: #ddd;
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
 .calendar-day.today {
   border: 2px solid #7cb342;
 }

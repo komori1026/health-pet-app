@@ -4,6 +4,7 @@ import {
   getDailyAchievement,
   getCommentForDate,
   findCharacterImage,
+  getEarliestDateKey,
 } from "./scoring.js?v=9";
 import { getMonthGrid } from "./calendar.js?v=9";
 import { getToken, saveToken, clearToken, fetchEntries, saveEntries } from "./github.js?v=9";
@@ -88,6 +89,7 @@ function renderCalendar() {
   const grid = document.getElementById("calendar-grid");
   grid.innerHTML = "";
   const weeks = getMonthGrid(viewYear, viewMonth);
+  const earliestKey = getEarliestDateKey(entries);
   for (const week of weeks) {
     for (const day of week) {
       const cell = document.createElement("button");
@@ -96,6 +98,12 @@ function renderCalendar() {
       if (!day.inMonth) cell.classList.add("outside");
       if (day.dateKey === todayKey) cell.classList.add("today");
       if (day.dateKey === selectedDate) cell.classList.add("selected");
+
+      const isBeforeData = earliestKey != null && day.dateKey < earliestKey;
+      if (isBeforeData) {
+        cell.classList.add("disabled");
+        cell.disabled = true;
+      }
 
       const num = document.createElement("span");
       num.className = "day-number";
@@ -108,7 +116,9 @@ function renderCalendar() {
         cell.appendChild(dot);
       }
 
-      cell.addEventListener("click", () => selectDate(day.dateKey));
+      if (!isBeforeData) {
+        cell.addEventListener("click", () => selectDate(day.dateKey));
+      }
       grid.appendChild(cell);
     }
   }

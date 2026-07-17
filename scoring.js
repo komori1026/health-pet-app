@@ -42,9 +42,21 @@ export function getCommentForDate(entries, dateKey) {
 }
 
 export function findCharacterImage(entries, dateKey) {
-  const keys = Object.keys(entries)
-    .filter((k) => k <= dateKey && entries[k] && entries[k].character_image)
+  const keysWithImage = Object.keys(entries)
+    .filter((k) => entries[k] && entries[k].character_image)
     .sort();
-  if (keys.length === 0) return null;
-  return entries[keys[keys.length - 1]].character_image;
+  if (keysWithImage.length === 0) return null;
+
+  let latestPastKey = null;
+  for (const k of keysWithImage) {
+    if (k > dateKey) break;
+    latestPastKey = k;
+  }
+  const chosenKey = latestPastKey || keysWithImage[0];
+  return entries[chosenKey].character_image;
+}
+
+export function getEarliestDateKey(entries) {
+  const keys = Object.keys(entries).sort();
+  return keys.length === 0 ? null : keys[0];
 }
