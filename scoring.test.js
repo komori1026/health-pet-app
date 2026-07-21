@@ -37,7 +37,7 @@ test("calculateTotalPoints は1日単位項目を目標達成した場合のみ1
       kyukanbi: 1, // 1日単位項目、目標1を達成、1pt
       aerobic: 10, // 1日単位項目、目標20に届かないので0pt
       tofu_first: 1, // 1日単位項目、目標1を達成、1pt
-      stretch: 5, // 1日単位項目、目標5ちょうど達成、1pt
+      stretch: 15, // 1日単位項目、目標15ちょうど達成、1pt
       posture: 0, // 1日単位項目、目標1未達、0pt
       omega3: 6, // 1日単位項目、目標6を達成、1pt
     },
@@ -46,10 +46,10 @@ test("calculateTotalPoints は1日単位項目を目標達成した場合のみ1
   assert.equal(calculateTotalPoints(entries), 4);
 });
 
-test("calculateTotalPoints は筋トレを15分以上で1ptとする", () => {
+test("calculateTotalPoints は筋トレを5分以上で1ptとする", () => {
   const entries = {
-    "2026-07-11": { kintore: 15 },
-    "2026-07-12": { kintore: 10 },
+    "2026-07-11": { kintore: 5 },
+    "2026-07-12": { kintore: 3 },
   };
   assert.equal(calculateTotalPoints(entries), 1);
 });
